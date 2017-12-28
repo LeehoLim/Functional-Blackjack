@@ -1,0 +1,702 @@
+var _user$project$BlackJack$cardImg = function (c) {
+	return _elm_lang$core$Native_Utils.eq(c.scard, 4) ? A3(
+		_evancz$elm_graphics$Element$image,
+		195,
+		220,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'Cards/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(c.tcard),
+				'_of_spades.png'))) : (_elm_lang$core$Native_Utils.eq(c.scard, 3) ? A3(
+		_evancz$elm_graphics$Element$image,
+		195,
+		220,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'Cards/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(c.tcard),
+				'_of_hearts.png'))) : (_elm_lang$core$Native_Utils.eq(c.scard, 2) ? A3(
+		_evancz$elm_graphics$Element$image,
+		195,
+		220,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'Cards/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(c.tcard),
+				'_of_diamonds.png'))) : (_elm_lang$core$Native_Utils.eq(c.scard, 1) ? A3(
+		_evancz$elm_graphics$Element$image,
+		195,
+		220,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'Cards/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(c.tcard),
+				'_of_clubs.png'))) : _evancz$elm_graphics$Element$show('Bogus case'))));
+};
+var _user$project$BlackJack$cardImgs = function (lc) {
+	var _p0 = lc;
+	if (_p0.ctor === '[]') {
+		return _evancz$elm_graphics$Element$empty;
+	} else {
+		return A2(
+			_evancz$elm_graphics$Element$flow,
+			_evancz$elm_graphics$Element$right,
+			{
+				ctor: '::',
+				_0: _user$project$BlackJack$cardImg(_p0._0),
+				_1: {
+					ctor: '::',
+					_0: _user$project$BlackJack$cardImgs(_p0._1),
+					_1: {ctor: '[]'}
+				}
+			});
+	}
+};
+var _user$project$BlackJack$checkAce = function (hnd) {
+	checkAce:
+	while (true) {
+		var _p1 = hnd;
+		if (_p1.ctor === '[]') {
+			return false;
+		} else {
+			if (_elm_lang$core$Native_Utils.eq(_p1._0.tcard, 1)) {
+				return true;
+			} else {
+				var _v2 = _p1._1;
+				hnd = _v2;
+				continue checkAce;
+			}
+		}
+	}
+};
+var _user$project$BlackJack$calcScoreHelper = function (hnd) {
+	var _p2 = hnd;
+	if (_p2.ctor === '[]') {
+		return 0;
+	} else {
+		var _p4 = _p2._1;
+		var _p3 = _p2._0;
+		return (_elm_lang$core$Native_Utils.cmp(_p3.tcard, 10) > -1) ? (10 + _user$project$BlackJack$calcScoreHelper(_p4)) : (_p3.tcard + _user$project$BlackJack$calcScoreHelper(_p4));
+	}
+};
+var _user$project$BlackJack$calcScore = function (hnd) {
+	return _user$project$BlackJack$checkAce(hnd) ? ((_elm_lang$core$Native_Utils.cmp(
+		_user$project$BlackJack$calcScoreHelper(hnd) + 10,
+		21) < 1) ? (_user$project$BlackJack$calcScoreHelper(hnd) + 10) : _user$project$BlackJack$calcScoreHelper(hnd)) : _user$project$BlackJack$calcScoreHelper(hnd);
+};
+var _user$project$BlackJack$bust = function (hand) {
+	return (_elm_lang$core$Native_Utils.cmp(
+		_user$project$BlackJack$calcScore(hand),
+		21) > 0) ? true : false;
+};
+var _user$project$BlackJack$blackJack = function (hand) {
+	return A2(
+		F2(
+			function (x, y) {
+				return x && y;
+			}),
+		_elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$List$length(hand),
+			2),
+		_elm_lang$core$Native_Utils.eq(
+			_user$project$BlackJack$calcScore(hand),
+			21)) ? true : false;
+};
+var _user$project$BlackJack$constant = function (value) {
+	return A2(
+		_elm_lang$core$Random$map,
+		function (_p5) {
+			return value;
+		},
+		_elm_lang$core$Random$bool);
+};
+var _user$project$BlackJack$choose = function (arr) {
+	if (_elm_lang$core$Array$isEmpty(arr)) {
+		return _user$project$BlackJack$constant(
+			{ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: arr});
+	} else {
+		var front = function (i) {
+			return A3(_elm_lang$core$Array$slice, 0, i, arr);
+		};
+		var lastIndex = _elm_lang$core$Array$length(arr) - 1;
+		var back = function (i) {
+			return _elm_lang$core$Native_Utils.eq(i, lastIndex) ? _elm_lang$core$Array$empty : A3(_elm_lang$core$Array$slice, i + 1, lastIndex + 1, arr);
+		};
+		var gen = A2(_elm_lang$core$Random$int, 0, lastIndex);
+		return A2(
+			_elm_lang$core$Random$map,
+			function (index) {
+				return {
+					ctor: '_Tuple2',
+					_0: A2(_elm_lang$core$Array$get, index, arr),
+					_1: A2(
+						_elm_lang$core$Array$append,
+						front(index),
+						back(index))
+				};
+			},
+			gen);
+	}
+};
+var _user$project$BlackJack$shuffle = function (lst) {
+	var arr = _elm_lang$core$Array$fromList(lst);
+	if (_elm_lang$core$Array$isEmpty(arr)) {
+		return _user$project$BlackJack$constant(arr);
+	} else {
+		var helper = function (_p6) {
+			var _p7 = _p6;
+			var _p12 = _p7._0;
+			return A2(
+				_elm_lang$core$Random$andThen,
+				function (_p8) {
+					var _p9 = _p8;
+					var _p11 = _p9._1;
+					var _p10 = _p9._0;
+					if (_p10.ctor === 'Nothing') {
+						return _user$project$BlackJack$constant(
+							{ctor: '_Tuple2', _0: _p12, _1: _p11});
+					} else {
+						return helper(
+							{
+								ctor: '_Tuple2',
+								_0: {ctor: '::', _0: _p10._0, _1: _p12},
+								_1: _p11
+							});
+					}
+				},
+				_user$project$BlackJack$choose(_p7._1));
+		};
+		return A2(
+			_elm_lang$core$Random$map,
+			function (_p13) {
+				return _elm_lang$core$Array$fromList(
+					_elm_lang$core$Tuple$first(_p13));
+			},
+			helper(
+				{
+					ctor: '_Tuple2',
+					_0: {ctor: '[]'},
+					_1: arr
+				}));
+	}
+};
+var _user$project$BlackJack$updateSeed = F2(
+	function (sd, dck) {
+		var _p14 = A2(_elm_lang$core$Random$step, dck, sd);
+		var a = _p14._0;
+		var b = _p14._1;
+		return b;
+	});
+var _user$project$BlackJack$shuffleDeck = F2(
+	function (sd, dck) {
+		var _p15 = A2(_elm_lang$core$Random$step, dck, sd);
+		var a = _p15._0;
+		var b = _p15._1;
+		return a;
+	});
+var _user$project$BlackJack$Card = F2(
+	function (a, b) {
+		return {tcard: a, scard: b};
+	});
+var _user$project$BlackJack$testHand = {
+	ctor: '::',
+	_0: A2(_user$project$BlackJack$Card, 10, 0),
+	_1: {
+		ctor: '::',
+		_0: A2(_user$project$BlackJack$Card, 5, 1),
+		_1: {ctor: '[]'}
+	}
+};
+var _user$project$BlackJack$testCard = A2(_user$project$BlackJack$Card, 7, 2);
+var _user$project$BlackJack$newDeck = function () {
+	var suitType = function (suit) {
+		return A2(
+			_elm_lang$core$List$map,
+			function (tp) {
+				return A2(_user$project$BlackJack$Card, tp, suit);
+			},
+			A2(_elm_lang$core$List$range, 1, 13));
+	};
+	return A2(
+		_elm_lang$core$List$concatMap,
+		suitType,
+		{
+			ctor: '::',
+			_0: 1,
+			_1: {
+				ctor: '::',
+				_0: 2,
+				_1: {
+					ctor: '::',
+					_0: 3,
+					_1: {
+						ctor: '::',
+						_0: 4,
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+}();
+var _user$project$BlackJack$makeCard = F2(
+	function (t, s) {
+		return A2(_user$project$BlackJack$Card, t, s);
+	});
+var _user$project$BlackJack$Dealer = F4(
+	function (a, b, c, d) {
+		return {hand: a, score: b, limit: c, alive: d};
+	});
+var _user$project$BlackJack$upDealer = F2(
+	function (crd, deal) {
+		var newHand = {ctor: '::', _0: crd, _1: deal.hand};
+		var newScore = _user$project$BlackJack$calcScore(newHand);
+		return (_elm_lang$core$Native_Utils.cmp(
+			_user$project$BlackJack$calcScore(newHand),
+			21) > 0) ? A4(_user$project$BlackJack$Dealer, newHand, newScore, 17, false) : A4(_user$project$BlackJack$Dealer, newHand, newScore, 17, true);
+	});
+var _user$project$BlackJack$Player = F3(
+	function (a, b, c) {
+		return {hand: a, score: b, alive: c};
+	});
+var _user$project$BlackJack$testPlayer = A3(
+	_user$project$BlackJack$Player,
+	_user$project$BlackJack$testHand,
+	_user$project$BlackJack$calcScore(_user$project$BlackJack$testHand),
+	true);
+var _user$project$BlackJack$upHand = F2(
+	function (crd, ply) {
+		var newHand = {ctor: '::', _0: crd, _1: ply.hand};
+		var newScore = _user$project$BlackJack$calcScore(newHand);
+		return (_elm_lang$core$Native_Utils.cmp(
+			_user$project$BlackJack$calcScore(newHand),
+			21) > 0) ? A3(_user$project$BlackJack$Player, newHand, newScore, false) : A3(_user$project$BlackJack$Player, newHand, newScore, true);
+	});
+var _user$project$BlackJack$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {deck: a, dealer: b, player: c, turn: d, win: e, seed: f};
+	});
+var _user$project$BlackJack$GotTime = function (a) {
+	return {ctor: 'GotTime', _0: a};
+};
+var _user$project$BlackJack$Tick = {ctor: 'Tick'};
+var _user$project$BlackJack$subscriptions = function (model) {
+	return A2(
+		_elm_lang$core$Time$every,
+		7000,
+		_elm_lang$core$Basics$always(_user$project$BlackJack$Tick));
+};
+var _user$project$BlackJack$GameOver = {ctor: 'GameOver'};
+var _user$project$BlackJack$DoNothing = {ctor: 'DoNothing'};
+var _user$project$BlackJack$NewGame = {ctor: 'NewGame'};
+var _user$project$BlackJack$Pass = {ctor: 'Pass'};
+var _user$project$BlackJack$Hit = {ctor: 'Hit'};
+var _user$project$BlackJack$Push = {ctor: 'Push'};
+var _user$project$BlackJack$PlayerWin = {ctor: 'PlayerWin'};
+var _user$project$BlackJack$DealerWin = {ctor: 'DealerWin'};
+var _user$project$BlackJack$gameOver = function (mdl) {
+	return (_user$project$BlackJack$blackJack(mdl.player.hand) && _user$project$BlackJack$blackJack(mdl.dealer.hand)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$Push, mdl.seed) : ((_user$project$BlackJack$blackJack(mdl.player.hand) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(mdl.dealer.hand),
+		false)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$PlayerWin, mdl.seed) : (((_elm_lang$core$Native_Utils.cmp(mdl.player.score, mdl.dealer.score) > 0) && (_elm_lang$core$Native_Utils.eq(mdl.player.alive, true) && _elm_lang$core$Native_Utils.eq(mdl.dealer.alive, true))) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$PlayerWin, mdl.seed) : ((_elm_lang$core$Native_Utils.eq(mdl.dealer.alive, false) && _elm_lang$core$Native_Utils.eq(mdl.player.alive, true)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$PlayerWin, mdl.seed) : ((_elm_lang$core$Native_Utils.eq(mdl.dealer.score, mdl.player.score) && _elm_lang$core$Native_Utils.eq(mdl.player.alive, true)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$Push, mdl.seed) : A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$DealerWin, mdl.seed)))));
+};
+var _user$project$BlackJack$DealerTurn = {ctor: 'DealerTurn'};
+var _user$project$BlackJack$whoWon = function (mdl) {
+	return ((_elm_lang$core$Native_Utils.cmp(mdl.player.score, mdl.dealer.score) > 0) && (_elm_lang$core$Native_Utils.cmp(mdl.player.score, 21) < 1)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$PlayerWin, mdl.seed) : ((_elm_lang$core$Native_Utils.eq(mdl.player.score, mdl.dealer.score) && (_elm_lang$core$Native_Utils.cmp(mdl.player.score, 21) < 1)) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$Push, mdl.seed) : (_user$project$BlackJack$bust(mdl.player.hand) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, _user$project$BlackJack$DealerTurn, _user$project$BlackJack$DealerWin, mdl.seed) : A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, mdl.turn, _user$project$BlackJack$DealerWin, mdl.seed)));
+};
+var _user$project$BlackJack$PlayerTurn = {ctor: 'PlayerTurn'};
+var _user$project$BlackJack$playerBust = function (mdl) {
+	return _user$project$BlackJack$bust(mdl.player.hand) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, _user$project$BlackJack$DealerTurn, mdl.win, mdl.seed) : A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, _user$project$BlackJack$PlayerTurn, mdl.win, mdl.seed);
+};
+var _user$project$BlackJack$hit = F2(
+	function (i, mdl) {
+		var fstcrd = A2(
+			_elm_lang$core$Maybe$withDefault,
+			A2(_user$project$BlackJack$Card, 0, 0),
+			A2(
+				_elm_lang$core$Array$get,
+				0,
+				_elm_lang$core$Array$fromList(mdl.deck)));
+		var updeck = _elm_lang$core$Array$toList(
+			A3(
+				_elm_lang$core$Array$slice,
+				1,
+				_elm_lang$core$Array$length(
+					_elm_lang$core$Array$fromList(mdl.deck)),
+				_elm_lang$core$Array$fromList(mdl.deck)));
+		return _elm_lang$core$Native_Utils.eq(i, _user$project$BlackJack$PlayerTurn) ? A6(
+			_user$project$BlackJack$Model,
+			updeck,
+			mdl.dealer,
+			A2(_user$project$BlackJack$upHand, fstcrd, mdl.player),
+			mdl.turn,
+			mdl.win,
+			mdl.seed) : A6(
+			_user$project$BlackJack$Model,
+			updeck,
+			A2(_user$project$BlackJack$upDealer, fstcrd, mdl.dealer),
+			mdl.player,
+			mdl.turn,
+			mdl.win,
+			mdl.seed);
+	});
+var _user$project$BlackJack$stay = function (mdl) {
+	return _elm_lang$core$Native_Utils.eq(mdl.turn, _user$project$BlackJack$PlayerTurn) ? A6(_user$project$BlackJack$Model, mdl.deck, mdl.dealer, mdl.player, _user$project$BlackJack$DealerTurn, mdl.win, mdl.seed) : _user$project$BlackJack$whoWon(mdl);
+};
+var _user$project$BlackJack$initialMD = function () {
+	var initialModel = A6(
+		_user$project$BlackJack$Model,
+		{ctor: '[]'},
+		A4(
+			_user$project$BlackJack$Dealer,
+			{ctor: '[]'},
+			0,
+			17,
+			true),
+		A3(
+			_user$project$BlackJack$Player,
+			{ctor: '[]'},
+			0,
+			true),
+		_user$project$BlackJack$PlayerTurn,
+		_user$project$BlackJack$Push,
+		_elm_lang$core$Random$initialSeed(289423));
+	return A6(
+		_user$project$BlackJack$Model,
+		_elm_lang$core$Array$toList(
+			A2(
+				_user$project$BlackJack$shuffleDeck,
+				initialModel.seed,
+				_user$project$BlackJack$shuffle(_user$project$BlackJack$newDeck))),
+		initialModel.dealer,
+		initialModel.player,
+		initialModel.turn,
+		initialModel.win,
+		A2(
+			_user$project$BlackJack$updateSeed,
+			initialModel.seed,
+			_user$project$BlackJack$shuffle(_user$project$BlackJack$newDeck)));
+}();
+var _user$project$BlackJack$init = {
+	ctor: '_Tuple2',
+	_0: _user$project$BlackJack$initialMD,
+	_1: A2(_elm_lang$core$Task$perform, _user$project$BlackJack$GotTime, _elm_lang$core$Time$now)
+};
+var _user$project$BlackJack$initialDeal = function (mdl) {
+	return A2(
+		_user$project$BlackJack$hit,
+		_user$project$BlackJack$DealerTurn,
+		A2(
+			_user$project$BlackJack$hit,
+			_user$project$BlackJack$PlayerTurn,
+			A2(
+				_user$project$BlackJack$hit,
+				_user$project$BlackJack$DealerTurn,
+				A2(_user$project$BlackJack$hit, _user$project$BlackJack$PlayerTurn, mdl))));
+};
+var _user$project$BlackJack$newGame = function (mdl) {
+	var newSeed = A2(
+		_user$project$BlackJack$updateSeed,
+		mdl.seed,
+		_user$project$BlackJack$shuffle(_user$project$BlackJack$newDeck));
+	var newd = _elm_lang$core$Array$toList(
+		A2(
+			_user$project$BlackJack$shuffleDeck,
+			newSeed,
+			_user$project$BlackJack$shuffle(_user$project$BlackJack$newDeck)));
+	return _user$project$BlackJack$initialDeal(
+		A6(
+			_user$project$BlackJack$Model,
+			newd,
+			A4(
+				_user$project$BlackJack$Dealer,
+				{ctor: '[]'},
+				0,
+				17,
+				true),
+			A3(
+				_user$project$BlackJack$Player,
+				{ctor: '[]'},
+				0,
+				true),
+			_user$project$BlackJack$PlayerTurn,
+			_user$project$BlackJack$Push,
+			newSeed));
+};
+var _user$project$BlackJack$update = F2(
+	function (msg, model) {
+		var dealerturn = 1;
+		var playerturn = 0;
+		var _p16 = msg;
+		switch (_p16.ctor) {
+			case 'DoNothing':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Hit':
+				return _elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$PlayerTurn) ? {
+					ctor: '_Tuple2',
+					_0: A2(_user$project$BlackJack$hit, _user$project$BlackJack$PlayerTurn, model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Pass':
+				return {
+					ctor: '_Tuple2',
+					_0: _user$project$BlackJack$stay(model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NewGame':
+				return {
+					ctor: '_Tuple2',
+					_0: _user$project$BlackJack$newGame(model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Tick':
+				return ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && ((_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.dealer.limit) < 0) && (_elm_lang$core$Native_Utils.eq(model.dealer.alive, true) && _elm_lang$core$Native_Utils.eq(
+					_user$project$BlackJack$blackJack(model.player.hand),
+					false)))) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.eq(model.dealer.score, model.dealer.limit) && (_elm_lang$core$Native_Utils.eq(
+					_user$project$BlackJack$checkAce(model.dealer.hand),
+					true) && _elm_lang$core$Native_Utils.eq(
+					_elm_lang$core$List$length(model.dealer.hand),
+					2))))) ? {
+					ctor: '_Tuple2',
+					_0: A2(_user$project$BlackJack$hit, _user$project$BlackJack$DealerTurn, model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'GameOver':
+				return {
+					ctor: '_Tuple2',
+					_0: _user$project$BlackJack$whoWon(model),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							seed: _elm_lang$core$Random$initialSeed(
+								_elm_lang$core$Basics$round(_p16._0))
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$BlackJack$dealerHand = function (mdl) {
+	var dh = mdl.dealer.hand;
+	var first = A2(
+		_elm_lang$core$Maybe$withDefault,
+		A2(_user$project$BlackJack$Card, 0, 0),
+		_elm_lang$core$List$head(dh));
+	return (_elm_lang$core$Native_Utils.eq(mdl.turn, _user$project$BlackJack$PlayerTurn) && _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(mdl.dealer.hand),
+		2)) ? A2(
+		_evancz$elm_graphics$Element$flow,
+		_evancz$elm_graphics$Element$right,
+		{
+			ctor: '::',
+			_0: _user$project$BlackJack$cardImg(first),
+			_1: {
+				ctor: '::',
+				_0: A3(_evancz$elm_graphics$Element$image, 195, 220, 'Cards/back_card.jpg'),
+				_1: {ctor: '[]'}
+			}
+		}) : _user$project$BlackJack$cardImgs(dh);
+};
+var _user$project$BlackJack$view = function (model) {
+	var dealHand = _elm_lang$core$Native_Utils.eq(
+		model.dealer.hand,
+		{ctor: '[]'}) ? _evancz$elm_graphics$Element$empty : _evancz$elm_graphics$Element$leftAligned(
+		A2(
+			_evancz$elm_graphics$Text$color,
+			_elm_lang$core$Color$white,
+			_evancz$elm_graphics$Text$fromString('Dealer Hand: ')));
+	var playHand = _elm_lang$core$Native_Utils.eq(
+		model.player.hand,
+		{ctor: '[]'}) ? _evancz$elm_graphics$Element$empty : _evancz$elm_graphics$Element$leftAligned(
+		A2(
+			_evancz$elm_graphics$Text$color,
+			_elm_lang$core$Color$white,
+			_evancz$elm_graphics$Text$fromString('Player Hand: ')));
+	var dealercommence = ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && ((_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.dealer.limit) < 0) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.player.hand),
+		false))) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.eq(model.dealer.score, model.dealer.limit) && (_elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(model.dealer.hand),
+		2) && (_elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$checkAce(model.dealer.hand),
+		true) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.player.hand),
+		false)))))) ? _evancz$elm_graphics$Element$toHtml(
+		_evancz$elm_graphics$Element$leftAligned(
+			_evancz$elm_graphics$Text$fromString('Dealer turn playing...'))) : _evancz$elm_graphics$Element$toHtml(_evancz$elm_graphics$Element$empty);
+	var $break = A2(
+		_elm_lang$html$Html$br,
+		{ctor: '[]'},
+		{ctor: '[]'});
+	var over = ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.dealer.limit) > -1)) || ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$PlayerTurn) && _elm_lang$core$Native_Utils.eq(model.player.alive, false)) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.player.hand),
+		true)))) ? (((_elm_lang$core$Native_Utils.eq(model.dealer.alive, false) && _elm_lang$core$Native_Utils.eq(model.player.alive, true)) || (((_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.player.score) < 0) && _elm_lang$core$Native_Utils.eq(model.player.alive, true)) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.player.hand),
+		true) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.dealer.hand),
+		false))))) ? _evancz$elm_graphics$Element$toHtml(
+		_evancz$elm_graphics$Element$leftAligned(
+			A2(
+				_evancz$elm_graphics$Text$height,
+				40,
+				_evancz$elm_graphics$Text$bold(
+					_evancz$elm_graphics$Text$fromString('Game over, player wins'))))) : ((_elm_lang$core$Native_Utils.eq(model.player.alive, false) || (((_elm_lang$core$Native_Utils.cmp(model.player.score, model.dealer.score) < 0) && _elm_lang$core$Native_Utils.eq(model.dealer.alive, true)) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.dealer.hand),
+		true) && _elm_lang$core$Native_Utils.eq(
+		_user$project$BlackJack$blackJack(model.player.hand),
+		false))))) ? _evancz$elm_graphics$Element$toHtml(
+		_evancz$elm_graphics$Element$leftAligned(
+			A2(
+				_evancz$elm_graphics$Text$height,
+				40,
+				_evancz$elm_graphics$Text$bold(
+					_evancz$elm_graphics$Text$fromString('Game over, dealer wins'))))) : _evancz$elm_graphics$Element$toHtml(
+		_evancz$elm_graphics$Element$leftAligned(
+			A2(
+				_evancz$elm_graphics$Text$height,
+				40,
+				_evancz$elm_graphics$Text$bold(
+					_evancz$elm_graphics$Text$fromString('Game over, push - tie game'))))))) : A2(
+		_elm_lang$html$Html$br,
+		{ctor: '[]'},
+		{ctor: '[]'});
+	var newGame = A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$NewGame),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('New Game'),
+			_1: {ctor: '[]'}
+		});
+	var standButton = (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$PlayerTurn) && _elm_lang$core$Native_Utils.eq(model.player.alive, true)) ? A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$Pass),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Pass'),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$DoNothing),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Pass'),
+			_1: {ctor: '[]'}
+		});
+	var hitButton = ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$PlayerTurn) && (_elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$isEmpty(model.player.hand),
+		false) && _elm_lang$core$Native_Utils.eq(model.player.alive, true))) || (_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.dealer.limit) < 0))) ? A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$Hit),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Hit'),
+			_1: {ctor: '[]'}
+		}) : ((_elm_lang$core$Native_Utils.eq(model.turn, _user$project$BlackJack$DealerTurn) && (_elm_lang$core$Native_Utils.cmp(model.dealer.score, model.dealer.limit) > 0)) ? A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$DoNothing),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Hit'),
+			_1: {ctor: '[]'}
+		}) : A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Events$onClick(_user$project$BlackJack$DoNothing),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Hit'),
+			_1: {ctor: '[]'}
+		}));
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: hitButton,
+			_1: {
+				ctor: '::',
+				_0: standButton,
+				_1: {
+					ctor: '::',
+					_0: newGame,
+					_1: {
+						ctor: '::',
+						_0: $break,
+						_1: {
+							ctor: '::',
+							_0: dealercommence,
+							_1: {
+								ctor: '::',
+								_0: over,
+								_1: {
+									ctor: '::',
+									_0: _evancz$elm_graphics$Element$toHtml(
+										_evancz$elm_graphics$Element$layers(
+											{
+												ctor: '::',
+												_0: A3(_evancz$elm_graphics$Element$fittedImage, 1136, 640, 'table.png'),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_evancz$elm_graphics$Element$above,
+														A2(
+															_evancz$elm_graphics$Element$above,
+															A2(
+																_evancz$elm_graphics$Element$above,
+																A2(_evancz$elm_graphics$Element$spacer, 100, 40),
+																A2(
+																	_evancz$elm_graphics$Element$above,
+																	dealHand,
+																	_user$project$BlackJack$dealerHand(model))),
+															A2(_evancz$elm_graphics$Element$spacer, 100, 40)),
+														A2(
+															_evancz$elm_graphics$Element$above,
+															playHand,
+															_user$project$BlackJack$cardImgs(model.player.hand))),
+													_1: {ctor: '[]'}
+												}
+											})),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _user$project$BlackJack$main = _elm_lang$html$Html$program(
+	{init: _user$project$BlackJack$init, view: _user$project$BlackJack$view, update: _user$project$BlackJack$update, subscriptions: _user$project$BlackJack$subscriptions})();
